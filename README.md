@@ -21,7 +21,7 @@
 
 ### explain SELECT * FROM person_info WHERE name = 'Ashburn' and birthday = '1980-01-01' AND phone_number > '15100000000'; -- 1. name = 'Ashburn' ，对 name 列进行精确查找，当然可以使用 B+ 树索引了。2. birthday > '1980-01-01' AND birthday < '2000-12-31' ，由于 name 列是精确查找，所以通过 name ='Ashburn' 条件查找后得到的结果的 name 值都是相同的，它们会再按照 birthday 的值进行排序。所以此时对 birthday 列进行范围查找是可以用到 B+ 树索引的。3. phone_number > '15100000000' ，通过 birthday 的范围查找的记录的 birthday 的值可能不同，所以这个条件无法再利用 B+ 树索引了，只能遍历上一步查询得到的记录。
 
-### explain SELECT * FROM person_info ORDER BY name, birthday, phone_number limit 10; -- 可以走索引，但是如果数据量小的话，mysql会认定走全表扫描效率高，可能不会走索引
+### explain SELECT * FROM person_info ORDER BY name, birthday, phone_number limit 10; -- 可以走索引，但是如果数据量小的话，mysql会认定走全表扫描效率高，可能不会走索引（但是必须按照索引顺序）
 
 ### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow'; -- 可以走索引，由于 B+ 树中的数据页和记录是先按 name 列排序的，所以我们上边的查询过程其实是这样的：找到 name 值为 Asa 的记录。找到 name 值为 Barlow 的记录。找到这些记录的主键值，再到 聚簇索引 中 回表 查找完整的记录。
 
