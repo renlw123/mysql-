@@ -1,3 +1,12 @@
+# innoDB结构
+![image](https://github.com/renlw123/mysql-/assets/74169518/d165a886-6152-45f9-a53d-ae16f417e54a) ![image](https://github.com/renlw123/mysql-/assets/74169518/91bd05fb-8302-4fd6-8205-4872f2d65927) ![image](https://github.com/renlw123/mysql-/assets/74169518/ad8c90d2-a27f-40ef-aaaa-4bd5e2775a3e)
+
+![image](https://github.com/renlw123/mysql-/assets/74169518/7f98a0ef-4f8b-4b66-88f2-7a4c1dff507b) ![image](https://github.com/renlw123/mysql-/assets/74169518/caa35810-3914-4930-a3c8-d22a51ecfb6c) ![image](https://github.com/renlw123/mysql-/assets/74169518/0410dbba-68d6-48c0-b862-7ba28862590f)
+
+
+
+
+
 ## DDL
 ### CREATE TABLE person_info(id INT NOT NULL auto_increment,name VARCHAR(100) NOT NULL,birthday DATE NOT NULL,phone_number CHAR(11) NOT NULL,country varchar(100) NOT NULL,PRIMARY KEY (id),KEY idx_name_birthday_phone_number (name, birthday, phone_number));
 
@@ -23,6 +32,8 @@
 
 ### explain SELECT * FROM person_info ORDER BY name, birthday, phone_number limit 10; -- 可以走索引，但是如果数据量小的话，mysql会认定走全表扫描效率高，可能不会走索引（但是必须按照索引顺序）
 
+### explain SELECT birthday FROM person_info ORDER BY  birthday   LIMIT 10; -- 也是可以走索引的，注意要关注查询字段与条件字段（这个查询字段属于联合索引）
+
 ### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow'; -- 可以走索引，由于 B+ 树中的数据页和记录是先按 name 列排序的，所以我们上边的查询过程其实是这样的：找到 name 值为 Asa 的记录。找到 name 值为 Barlow 的记录。找到这些记录的主键值，再到 聚簇索引 中 回表 查找完整的记录。
 
 ### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow' AND birthday > '1980-01-01'; --在B+Tree中只能用到name索引，因为name条件查询结果不固定，所以birthday使用不到索引
@@ -31,4 +42,21 @@
 
 ### explain SELECT * FROM person_info WHERE name = 'A' ORDER BY birthday, phone_number LIMIT 10; -- 也是可以走索引的
 
-### explain SELECT * FROM person_info  ORDER BY birthday, phone_number LIMIT 10; -- 但是这样走不了索引
+### explain SELECT * FROM person_info  ORDER BY birthday, phone_number LIMIT 10; -- 但是这样走不了索引（使用联合索引的各个排序列的排序顺序必须是一致的，ORDER BY name, birthday DESC如果一个asc,一个Desc 排序是走不了索引的）
+
+### explain SELECT * FROM person_info WHERE country = 'China' ORDER BY name LIMIT 10; -- 这个查询只能先把符合搜索条件 country = 'China' 的记录提取出来后再进行排序，是使用不到索引。
+
+### explain SELECT * FROM person_info WHERE name = 'A' ORDER BY birthday, phone_number LIMIT 10; -- 虽然这个查询也有搜索条件，但是 name = 'A' 可以使用到索引 idx_name_birthday_phone_number ，而且过滤剩下的记录还是按照 birthday 、 phone_number 列排序的，所以还是可以使用索引进行排序的。
+
+### explain SELECT * FROM person_info ORDER BY UPPER(name), birthday , phone_number  LIMIT 10; -- 使用了函数就不再是单独的列了，所以是用不了索引
+
+### explain SELECT name, birthday, phone_number FROM person_info WHERE name > 'Asa' AND name < 'Barlow'; -- 这样避免了回表，查询结果只包含索引就会省去在聚簇索引中再去查找一次    索引覆盖(查询列表里只包含索引列)
+
+## 选择索引
+### 列的基数：例如某一列包含1，2，3，1，2，3，1，2，3九条数据，那么列的基数为3，列的技术越大索引的利用率越好，所以尽量选择基数大的列作为索引
+### 列的类型：索引列的类型越小越好，有 TINYINT 、 MEDIUMINT 、 INT 、 BIGINT这么几种，它们占用的存储空间依次递增，我们这里所说的 类型大小 指的就是该类型表示的数据范围的大小。能表示的整数范围当然也是依次递增，如果我们想要对某个整数列建立索引的话，在表示的整数范围允许的情况下，尽量让索引列使用较小的类型，比如我们能使用 INT 就不要使用 BIGINT ，能使用 MEDIUMINT 就不要使用INT ～ 这是因为：数据类型越小，在查询时进行的比较操作越快（这是CPU层次的东东）数据类型越小，索引占用的存储空间就越少，在一个数据页内就可以放下更多的记录，从而减少磁盘 I/O 带来的性能损耗，也就意味着可以把更多的数据页缓存在内存中，从而加快读写效率。这个建议对于表的主键来说更加适用，因为不仅是聚簇索引中会存储主键值，其他所有的二级索引的节点处都会存储一份记录的主键值，如果主键适用更小的数据类型，也就意味着节省更多的存储空间和更高效的 I/O 。
+### 索引字符串前缀：KEY idx_name_birthday_phone_number (name(10), birthday, phone_number)， name(10) 就表示在建立的 B+ 树索引中只保留记录的前 10 个字符的编码，这种只索引字符串值的前缀的策略是我们非常鼓励的，尤其是在字符串类型能存储的字符比较多的时候。
+### 索引列在表达式中单独出现：1. WHERE my_col * 2 < 42. WHERE my_col < 4/2第1个 WHERE 子句中 my_col 列并不是以单独列的形式出现的，而是以 my_col * 2 这样的表达式的形式出现的，存储引擎会依次遍历所有的记录，计算这个表达式的值是不是小于 4 ，所以这种情况下是使用不到为 my_col 列建立的 B+ 树索引的。而第2个 WHERE 子句中 my_col 列并是以单独列的形式出现的，这样的情况可以直接使用B+ 树索引。所以结论就是：如果索引列在比较表达式中不是以单独列的形式出现，而是以某个表达式，或者函数调用形式出现的话，是用不到索引的。
+
+## 总结
+### 上边只是我们在创建和使用 B+ 树索引的过程中需要注意的一些点。本集内容总结如下：1. B+ 树索引在空间和时间上都有代价，所以没事儿别瞎建索引。2. B+ 树索引适用于下边这些情况：全值匹配匹配左边的列匹配范围值精确匹配某一列并范围匹配另外一列用于排序用于分组3. 在使用索引时需要注意下边这些事项：只为用于搜索、排序或分组的列创建索引为列的基数大的列创建索引索引列的类型尽量小可以只对字符串值的前缀建立索引只有索引列在比较表达式中单独出现才可以适用索引为了尽可能少的让 聚簇索引 发生页面分裂和记录移位的情况，建议让主键拥有 AUTO_INCREMENT 属性。定位并删除表中的重复和冗余索引尽量使用 覆盖索引 进行查询，避免 回表 带来的性能损耗。
