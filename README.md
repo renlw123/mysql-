@@ -1,16 +1,49 @@
-# innoDB结构
+## innoDB结构
+
+
+### File Header: 表示页的一些通用信息，占固定的38字节
+#### FIL_PAGE_SPACE_OR_CHKSUM 4 字节 页的校验和（checksum值）
+#### FIL_PAGE_OFFSET 4 字节 页号
+#### FIL_PAGE_PREV 4 字节 上一个页的页号
+#### FIL_PAGE_NEXT 4 字节 下一个页的页号
+#### FIL_PAGE_LSN 8 字节 页面被最后修改时对应的日志序列位置（英文名是：Log SequenceNumber）
+#### FIL_PAGE_TYPE 2 字节 该页的类型
+#### FIL_PAGE_FILE_FLUSH_LSN 8 字节 仅在系统表空间的一个页中定义，代表文件至少被刷新到了对应的LSN值
+#### FIL_PAGE_ARCH_LOG_NO_OR_SPACE_ID 4 字节 页属于哪个表空间
+
+### Page Header:表示数据页专有的一些信息，占固定的56个字节
+#### PAGE_N_DIR_SLOTS 2 字节 在页目录中的槽数量
+#### PAGE_HEAP_TOP 2 字节 还未使用的空间最小地址，也就是说从该地址之后就是 Free Space
+#### PAGE_N_HEAP 2 字节 本页中的记录的数量（包括最小和最大记录以及标记为删除的记录）
+#### PAGE_FREE 2 字节 第一个已经标记为删除的记录地址（各个已删除的记录通过 next_record 也会组成一个单链表，这个单链表中的记录可以被重新利用）
+#### PAGE_GARBAGE 2 字节 已删除记录占用的字节数
+#### PAGE_LAST_INSERT 2 字节 最后插入记录的位置
+#### PAGE_DIRECTION 2 字节 记录插入的方向
+#### PAGE_N_DIRECTION 2 字节 一个方向连续插入的记录数量
+#### PAGE_N_RECS 2 字节 该页中记录的数量（不包括最小和最大记录以及被标记为删除的记录）
+#### PAGE_MAX_TRX_ID 8 字节 修改当前页的最大事务ID，该值仅在二级索引中定义
+#### PAGE_LEVEL 2 字节 当前页在B+树中所处的层级
+#### PAGE_INDEX_ID 8 字节 索引ID，表示当前页属于哪个索引
+#### PAGE_BTR_SEG_LEAF 10 字节 B+树叶子段的头部信息，仅在B+树的Root页定义
+#### PAGE_BTR_SEG_TOP 10 字节 B+树非叶子段的头部信息，仅在B+树的Root页定义
+### Infimum + Supremum:两个虚拟的伪记录，分别表示页中的最小和最大记录，占固定的 26 个字节。
+### User Records ：真实存储我们插入的记录的部分，大小不固定。
+### Free Space ：页中尚未使用的部分，大小不确定。
+### Page Directory ：页中的某些记录相对位置，也就是各个槽在页面中的地址偏移量，大小不固定，插入的记录越多，这个部分占用的空间越多。
+### File Trailer ：用于检验页是否完整的部分，占用固定的8个字节。
+
 ![image](https://github.com/renlw123/mysql-/assets/74169518/d165a886-6152-45f9-a53d-ae16f417e54a) ![image](https://github.com/renlw123/mysql-/assets/74169518/91bd05fb-8302-4fd6-8205-4872f2d65927) ![image](https://github.com/renlw123/mysql-/assets/74169518/ad8c90d2-a27f-40ef-aaaa-4bd5e2775a3e)
 
 ![image](https://github.com/renlw123/mysql-/assets/74169518/7f98a0ef-4f8b-4b66-88f2-7a4c1dff507b) ![image](https://github.com/renlw123/mysql-/assets/74169518/caa35810-3914-4930-a3c8-d22a51ecfb6c) ![image](https://github.com/renlw123/mysql-/assets/74169518/0410dbba-68d6-48c0-b862-7ba28862590f)
 
-
-
-
+### 页目录 ![image](https://github.com/renlw123/mysql-/assets/74169518/ca7b127e-32ed-49e5-8608-d2770f0f7ffa) ![image](https://github.com/renlw123/mysql-/assets/74169518/0107e695-303f-47a8-a892-0cd186fe81c5)
 
 ## DDL
 ### CREATE TABLE person_info(id INT NOT NULL auto_increment,name VARCHAR(100) NOT NULL,birthday DATE NOT NULL,phone_number CHAR(11) NOT NULL,country varchar(100) NOT NULL,PRIMARY KEY (id),KEY idx_name_birthday_phone_number (name, birthday, phone_number));
 
 ## DML(验证B+Tree)
+### 结构导图![image](https://github.com/renlw123/mysql-/assets/74169518/60c869a6-b359-4d98-b7c5-13bdc3c98bba) ![image](https://github.com/renlw123/mysql-/assets/74169518/a629fd64-9986-4c01-a862-48133bcf2010)
+### 真实情况![image](https://github.com/renlw123/mysql-/assets/74169518/f02164e0-6cbf-4126-9e5c-c39f10a49c3d) ![image](https://github.com/renlw123/mysql-/assets/74169518/e552abf4-a5d7-49ed-9078-94cba1200b8c)
 
 ### INSERT INTO test.person_info (id, name, birthday, phone_number, country) VALUES(1, '1', '2022-12-12', '', '');
 
