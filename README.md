@@ -28,3 +28,7 @@
 ### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow' AND birthday > '1980-01-01'; --在B+Tree中只能用到name索引，因为name条件查询结果不固定，所以birthday使用不到索引
 
 ### explain SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday > '1980-01-01' AND birthday < '2000-12-31' AND phone_number > '15100000000'; --同上，在B+Tree中只能使用到name与birthday索引，所以phone_number走不到索引
+
+### explain SELECT * FROM person_info WHERE name = 'A' ORDER BY birthday, phone_number LIMIT 10; -- 也是可以走索引的
+
+### explain SELECT * FROM person_info  ORDER BY birthday, phone_number LIMIT 10; -- 但是这样走不了索引
