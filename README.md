@@ -32,9 +32,12 @@
 ### Page Directory ：页中的某些记录相对位置，也就是各个槽在页面中的地址偏移量，大小不固定，插入的记录越多，这个部分占用的空间越多。
 ### File Trailer ：用于检验页是否完整的部分，占用固定的8个字节。
 
-![image](https://github.com/renlw123/mysql-/assets/74169518/d165a886-6152-45f9-a53d-ae16f417e54a) ![image](https://github.com/renlw123/mysql-/assets/74169518/91bd05fb-8302-4fd6-8205-4872f2d65927) ![image](https://github.com/renlw123/mysql-/assets/74169518/ad8c90d2-a27f-40ef-aaaa-4bd5e2775a3e)
-
-![image](https://github.com/renlw123/mysql-/assets/74169518/7f98a0ef-4f8b-4b66-88f2-7a4c1dff507b) ![image](https://github.com/renlw123/mysql-/assets/74169518/caa35810-3914-4930-a3c8-d22a51ecfb6c) ![image](https://github.com/renlw123/mysql-/assets/74169518/0410dbba-68d6-48c0-b862-7ba28862590f)
+![image](https://github.com/renlw123/mysql-/assets/74169518/d165a886-6152-45f9-a53d-ae16f417e54a) 
+![image](https://github.com/renlw123/mysql-/assets/74169518/91bd05fb-8302-4fd6-8205-4872f2d65927) 
+![image](https://github.com/renlw123/mysql-/assets/74169518/ad8c90d2-a27f-40ef-aaaa-4bd5e2775a3e)
+![image](https://github.com/renlw123/mysql-/assets/74169518/7f98a0ef-4f8b-4b66-88f2-7a4c1dff507b) 
+![image](https://github.com/renlw123/mysql-/assets/74169518/caa35810-3914-4930-a3c8-d22a51ecfb6c) 
+![image](https://github.com/renlw123/mysql-/assets/74169518/0410dbba-68d6-48c0-b862-7ba28862590f)
 
 ### 页目录 ![image](https://github.com/renlw123/mysql-/assets/74169518/ca7b127e-32ed-49e5-8608-d2770f0f7ffa) ![image](https://github.com/renlw123/mysql-/assets/74169518/0107e695-303f-47a8-a892-0cd186fe81c5)
 
