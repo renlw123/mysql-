@@ -49,6 +49,7 @@
 ### 结构导图![image](https://github.com/renlw123/mysql-/assets/74169518/60c869a6-b359-4d98-b7c5-13bdc3c98bba) ![image](https://github.com/renlw123/mysql-/assets/74169518/a629fd64-9986-4c01-a862-48133bcf2010)
 ### 聚簇索引真实情况![image](https://github.com/renlw123/mysql-/assets/74169518/f02164e0-6cbf-4126-9e5c-c39f10a49c3d) ![image](https://github.com/renlw123/mysql-/assets/74169518/e552abf4-a5d7-49ed-9078-94cba1200b8c)
 ### 非聚簇索引真实情况![image](https://github.com/renlw123/mysql-/assets/74169518/c431651b-7890-4f3c-94ad-09073e63ae22)
+### 联合索引真实情况![image](https://github.com/renlw123/mysql-/assets/74169518/85aed8ed-b688-41c5-b61e-96d9da8808d0)
 
 
 ### INSERT INTO test.person_info (id, name, birthday, phone_number, country) VALUES(1, '1', '2022-12-12', '', '');
