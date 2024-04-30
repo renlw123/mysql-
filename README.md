@@ -67,11 +67,13 @@
 
 ### explain SELECT birthday FROM person_info ORDER BY  birthday   LIMIT 10; -- 也是可以走索引的，注意要关注查询字段与条件字段（这个查询字段属于联合索引）
 
+### explain SELECT country, phone_number FROM person_info ORDER BY name LIMIT 10; -- 走不了索引由于country
+
 ### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow'; -- 可以走索引，由于 B+ 树中的数据页和记录是先按 name 列排序的，所以我们上边的查询过程其实是这样的：找到 name 值为 Asa 的记录。找到 name 值为 Barlow 的记录。找到这些记录的主键值，再到 聚簇索引 中 回表 查找完整的记录。
 
-### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow' AND birthday > '1980-01-01'; --在B+Tree中只能用到name索引，因为name条件查询结果不固定，所以birthday使用不到索引
+### explain SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow' AND birthday > '1980-01-01'; -- 在B+Tree中只能用到name索引，因为name条件查询结果不固定，所以birthday使用不到索引
 
-### explain SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday > '1980-01-01' AND birthday < '2000-12-31' AND phone_number > '15100000000'; --同上，在B+Tree中只能使用到name与birthday索引，所以phone_number走不到索引
+### explain SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday > '1980-01-01' AND birthday < '2000-12-31' AND phone_number > '15100000000'; -- 同上，在B+Tree中只能使用到name与birthday索引，所以phone_number走不到索引
 
 ### explain SELECT * FROM person_info WHERE name = 'A' ORDER BY birthday, phone_number LIMIT 10; -- 也是可以走索引的
 
