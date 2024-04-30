@@ -35,6 +35,7 @@
 ![image](https://github.com/renlw123/mysql-/assets/74169518/d165a886-6152-45f9-a53d-ae16f417e54a) 
 ![image](https://github.com/renlw123/mysql-/assets/74169518/91bd05fb-8302-4fd6-8205-4872f2d65927) 
 ![image](https://github.com/renlw123/mysql-/assets/74169518/ad8c90d2-a27f-40ef-aaaa-4bd5e2775a3e)
+### 针对每一条记录
 ![image](https://github.com/renlw123/mysql-/assets/74169518/7f98a0ef-4f8b-4b66-88f2-7a4c1dff507b) 
 ![image](https://github.com/renlw123/mysql-/assets/74169518/caa35810-3914-4930-a3c8-d22a51ecfb6c) 
 ![image](https://github.com/renlw123/mysql-/assets/74169518/0410dbba-68d6-48c0-b862-7ba28862590f)
